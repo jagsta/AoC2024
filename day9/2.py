@@ -9,7 +9,29 @@ f = open("input.txt")
 #Then iterate from beginning of array with a window of that size, looking for all Nones, if one is found, write the file id to those positions, and overwrite the files original positions with None
 #Then do the math
 
+#This runs like dog poo, maybe use lists of files and spaces to speed the ordering up and avoid the sliding window, which is clearly very slow
+def defrag(fid):
+    size=files[fid][0]
+    end=files[fid][1]
+#    print("fid:",fid," size:",size)
+    # find the first gap which fits
+    for i in range(len(gaps)):
+        if gaps[i][0]==size and gaps[i][1]<files[fid][1]:
+#           print("fits exactly in ",size)
+            files[fid][1]=gaps[i][1]
+            gaps.pop(i)
+            break
+        elif gaps[i][0]>size and gaps[i][1]<files[fid][1]:
+#            print("gap too big by ",gaps[i][0]-size,"remainder index is ",gaps[i][1]+size)
+            files[fid][1]=gaps[i][1]
+            gaps[i][0]-=size
+            gaps[i][1]+=size
+            break
+
+files=[]
+gaps=[]
 blocks=[]
+index=0
 space=0 #0=file,1=space
 fid=0
 for char in f.readline().strip():
@@ -17,6 +39,7 @@ for char in f.readline().strip():
     if not space:
         if size==0:
             space=1
+        files.append([size,index])
         for i in range(size):
             blocks.append(fid)
             space=1
@@ -24,47 +47,24 @@ for char in f.readline().strip():
     elif space:
         if size==0:
             space=0
+        else:
+            gaps.append([size,index])
         for i in range(size):
             blocks.append(None)
             space=0
-print(blocks)
+    index+=size
+#print(files)
+#print(gaps)
+#print(blocks)
 #Compactify the filesystem
+#try the new way
+for file in reversed(range(len(files))):
+    defrag(file)
+#print(files)
+#print(gaps)
+newtotal=0
+for i in range(len(files)):
+    for j in range(files[i][0]):
+        newtotal+=(i*(files[i][1]+j))
+print(newtotal)
 
-rindex=len(blocks)-1
-#print (len(blocks),rindex,fid, blocks[-1])
-while (fid>0):
-    fid-=1
-    filesize=0
-#    print (len(blocks),rindex,fid, blocks[rindex])
-    while blocks[rindex] != fid:
-#        print(fid,rindex)
-        rindex-=1
-    while(blocks[rindex]==fid):
-        filesize+=1
-        rindex-=1
-#    print(rindex,fid,filesize)
-    found=0
-    lindex=0
-    while(found==0 and lindex+filesize-1<rindex+1):
-        window=blocks[lindex:lindex+filesize]
-#        print(window)
-        if (window.count(None) == len(window)):
-#            print("found a space!",lindex)
-            #it fits!
-            found=1
-            for i in range(len(window)):
-                blocks[lindex+i]=fid
-                blocks[rindex+i+1]=None
-#            print(blocks)
-        else:
-            for i in window:
-                if i is not None:
-                    lindex+=1
-
-print(blocks)
-#Do the math
-total=0
-for i in range(len(blocks)):
-    if blocks[i] is not None:
-        total=total+(blocks[i]*i)
-print ("Checksum: ",total)

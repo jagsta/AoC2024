@@ -12,7 +12,6 @@ f = open("input.txt")
 #This runs like dog poo, maybe use lists of files and spaces to speed the ordering up and avoid the sliding window, which is clearly very slow
 def defrag(fid):
     size=files[fid][0]
-    end=files[fid][1]
 #    print("fid:",fid," size:",size)
     # find the first gap which fits
     for i in range(len(gaps)):
@@ -30,32 +29,22 @@ def defrag(fid):
 
 files=[]
 gaps=[]
-blocks=[]
-index=0
 space=0 #0=file,1=space
-fid=0
+index=0
 for char in f.readline().strip():
     size = int(char)
     if not space:
         if size==0:
             space=1
         files.append([size,index])
-        for i in range(size):
-            blocks.append(fid)
-            space=1
-        fid+=1
+        space=1
     elif space:
         if size==0:
             space=0
         else:
             gaps.append([size,index])
-        for i in range(size):
-            blocks.append(None)
-            space=0
+        space=0
     index+=size
-#print(files)
-#print(gaps)
-#print(blocks)
 #Compactify the filesystem
 #try the new way
 for file in reversed(range(len(files))):

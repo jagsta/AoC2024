@@ -45,7 +45,7 @@ while (fid>0):
 #    print(rindex,fid,filesize)
     found=0
     lindex=0
-    while(found==0 and (lindex+filesize)<len(blocks) and lindex+filesize-1<rindex+1):
+    while(found==0 and lindex+filesize-1<rindex+1):
         window=blocks[lindex:lindex+filesize]
 #        print(window)
         if (window.count(None) == len(window)):
@@ -57,7 +57,9 @@ while (fid>0):
                 blocks[rindex+i+1]=None
 #            print(blocks)
         else:
-            lindex+=1
+            for i in window:
+                if i is not None:
+                    lindex+=1
 
 print(blocks)
 #Do the math

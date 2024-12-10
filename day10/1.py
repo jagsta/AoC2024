@@ -1,0 +1,3 @@
+f = open("input.txt")
+
+#Need to think about approach here, gut feel is a directed graph (per start point?) as there could be multiple paths to the same end point, although I could handle this by adding end points to a set for each start point and summing them...

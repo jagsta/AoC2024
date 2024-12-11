@@ -5,6 +5,12 @@
 # precompute the trees for 0 - 9, these can replace any instances of a single digit
 # We don't care about intermediates, we only care about the number of nodes at depth = blinks
 # We can skip any calculations until we exceed the target blinks on a given tree, then back track to the right number of blinks
+#
+# For each starting stone, traverse the tree, skipping, until blinks>target
+# We'll need to do this recursively, depth first?
+# When we exceed the target, we'll add the number of nodes at the correct depth to a count of nodes, then carry on
+# Iterate over the initial stones tallying up the nodes
+
 
 from timeit import default_timer as timer
 f = open("input.txt")

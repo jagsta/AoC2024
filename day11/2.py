@@ -1,5 +1,5 @@
 from timeit import default_timer as timer
-f = open("input.txt")
+f = open("example.txt")
 
 
 def process_number(number,index):
@@ -14,8 +14,9 @@ def process_number(number,index):
             num1 = int(str(number)[:(int(len(str(number))/2))])
             num2 = int(str(number)[int(len(str(number))/2):])
 #        print ("found even number of digits",num1,num2)
-        stones.insert(index,num1)
-        stones[index+1]=num2
+#       Do we need to preserve order here? I think not, it doesn't affect the rules which are atomic
+        stones[index] = num1
+        stones.append(num2)
     else:
         number*=2024
         stones[index]=number

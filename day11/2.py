@@ -8,15 +8,16 @@ def process_number(number,index):
         stones[index]="1"
     elif len(number) % 2 ==0:
         j=int(len(number)/2)
-        num1 = number[:j]
-        num2 = number[j:]
+        if j==2:
+            stones[index]=number[0]
+            stones.append(number[1])
+        else:
 #        print ("found even number of digits",num1,num2)
 #       Do we need to preserve order here? I think not, it doesn't affect the rules which are atomic
-        stones[index] = num1
-        stones.append(num2)
+            stones[index] = number[:j]
+            stones.append(number[j:])
     else:
-        number=int(number)*2024
-        stones[index]=str(number)
+        stones[index]=str(int(number)*2024)
 
 
 

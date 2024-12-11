@@ -27,7 +27,7 @@ for number in f.readline().split():
 #    print (stones)
 
 blinks=1
-while (blinks<76):
+while (blinks<26):
     start=timer()
     for i in range(len(stones)):
 #        print("processing ",stones[i], i)

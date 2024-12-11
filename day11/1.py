@@ -28,13 +28,13 @@ for number in f.readline().split():
 #    print (stones)
 
 blinks=1
-while (blinks<76):
+while (blinks<26):
     start=timer()
     for i in reversed(range(len(stones))):
 #        print("processing ",stones[i], i)
         process_number(stones[i],i)
     end=timer()
-    print("blinks: ",blinks, "blink took: ",end-start)
+    print("blinks: ",blinks, "blink took: ",end-start," total is ",len(stones))
     blinks+=1
 
 print(len(stones))

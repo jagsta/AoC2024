@@ -1,3 +1,11 @@
+#This can't work by brute force for blinks = 75
+# Odd length numbers > 99 need to be computed until the result is an even length
+# Any even length number will decompose into single digits in (length)/2 blinks
+# Any single digit will decompose to a set of single digits in a fixed number of blinks - 0(1), 1,2,3,4(3), 5,6,7,8,9(5)
+# precompute the trees for 0 - 9, these can replace any instances of a single digit
+# We don't care about intermediates, we only care about the number of nodes at depth = blinks
+# We can skip any calculations until we exceed the target blinks on a given tree, then back track to the right number of blinks
+
 from timeit import default_timer as timer
 f = open("input.txt")
 

@@ -77,25 +77,28 @@ def find_paths(x,y,s,sdir):
     for _ in range(3):
         nx=x+sdir[0]
         if nx<0 or nx>xmax:
+            s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
-            s.fences[d.left(sdir)]=1
-            sides+=1
             continue
         ny=y+sdir[1]
         if ny<0 or ny>ymax:
+            s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
-            s.fences[d.left(sdir)]=1
-            sides+=1
             continue
-        if grid[ny][nx]==f:
+        if grid[ny][nx]==s.char:
             print("found another ",s.char," at: ",nx,ny,sdir)
-            nadj,nsquares=find_paths(nx,ny,f,sdir)
+            if s.fences[d.left(sdir)==0:
+                sides+=1
+            if grid[ny][nx].fences==1:
+                sides-=1
+            nadj,nsquares=find_paths(nx,ny,grid[ny][nx],sdir)
             sides+=nadj
             squares+=nsquares
         else:
-            sides+=1
+            if s.fences[d.left(sdir)==0:
+                sides+=1
             sdir=d.right(sdir)
             s.tracked+=1
             s.fences[d.left(sdir)]=1

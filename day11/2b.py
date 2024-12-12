@@ -12,72 +12,43 @@
 # When we exceed the target, we'll add the number of nodes at the correct depth to a count of nodes, then carry on
 # Iterate over the initial stones tallying up the nodes
 
+#Rethink time, too complicated to wrap my head around :/
+
+
 
 from timeit import default_timer as timer
 import math
-import networkx as nx
-import matplotlib.pyplot as plt
-
-class memo:
-    maxdepth=0
-    depth={}
 
 f = open("input.txt")
 
-def process_number(n,adepth,rdepth,target):
-    print("processing ",n," at depth",depth)
-    if (adepth==target):
-#        print(n," is at depth ",depth," adding 1 to count")
-        return 1
+def process_number(n,target):
+#    print("processing ",n," at blinks",target)
     count=0
-    if n in cache:
-        #are we more than maxdepth?
-        if rdepth>cache[n].maxdepth:
-            cache[n].maxdepth=rdepth
-            cache[n].depth[rdepth].append(n)
-        #how many blinks can we skip?
-        skip=cache[n].maxdepth
-        if adepth+skip>target:
-            #too much, see if we have the right number
-            if cache[n].depth[target-adepth]:
-                #process each number at that depth
-                for i in cache[n].depth[target-adepth]:
-                    count+=1
-                return count
-            else:
-                # Nope, what's the best we can do?
-                best=target-adepth
-                while not cache[n].depth[i]:
-                    best-=1
-                for i in cache[n].depth[best]:
-                    count+=process_number(i,adepth+best,rdepth+best,target)
-        else:
-            #we can jump maxdepth
-            for i in cache[n].depth[maxdepth]:
-                count+=process_number(i,adepth+cache[n].maxdepth,rdepth+cache[n].maxdepth,target)
-    else:
-        #new number, add to cache
-        cache[n]=memo()
-        rdepth=1
+    if (target==0):
+#        print(n," bottomed out, adding 1 to count")
+        return 1
+    if (n+"."+str(target)) in cache:
+        #we know this product already
+#        print("cache hit for",n+"."+str(target))
+#        hits+=1
+        return cache[n+"."+str(target)]
+#   No cache hit, so carry on
     if n=="0":
- #       g.add_edge(n,"1")
-        count+=process_number("1",adepth+1,rdepth,target)
+        count+=process_number("1",target-1)
     elif len(n) % 2==1:
         #odd
- #       g.add_edge(n,str(int(n)*2024))
-        count+=process_number(str(int(n)*2024),adepth+1,rdepth,target)
+        count+=process_number(str(int(n)*2024),target-1)
     else:
         #even
         j=int(len(n)/2)
 #        print ("found even number of digits",n)
         num1=int(n[:j])
         num2=int(n[j:])
-#        g.add_edge(n,str(num1))
-        count+=process_number(str(num1),adepth+1,rdepth,target)
-#        g.add_edge(n,str(num2))
-        count+=process_number(str(num2),adepth+1,rdepth,target)
+        count+=process_number(str(num1),target-1)
+        count+=process_number(str(num2),target-1)
 #        print ("odd length: ",n)
-
+    cache[n+"."+str(target)]=count
+#    print("Adding ",n+"."+str(target),count," to cache")
     return count
 
 
@@ -87,22 +58,20 @@ for number in f.readline().split():
     stones.append(number.strip())
 #    print (stones)
 
+hits=0
 cache={}
 count=0
-skips=0
-depth=0
-g=nx.DiGraph()
-targetblinks=5
-for n in stones:
-    start=timer()
-    print("processing ",n, "at depth",depth)
-    result=process_number(str(n),depth,targetblinks)
-    count+=result
-    end=timer()
-    print("finished ",n," with result",result,"in ",end-start,"total",count)
+targetblinks=75
+for blinks in range(targetblinks):
+    for n in stones:
+        blinks+=1
+#        print("processing ",n, "at ",blinks,"blinks")
+        result=process_number(str(n),blinks)
+        if blinks==targetblinks:
+            count+=result
+#        print("finished ",n," with result",result,"total",count)
 #    nx.draw_networkx(g,arrows=True)
 #    plt.show()
-print(count)
-print(len(cache))
+#print(len(cache))
 #print(cache)
-print(g.number_of_edges())
+print("Total stones after",targetblinks,"is",count,"with")

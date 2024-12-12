@@ -59,18 +59,18 @@ sdirs=[[0,-1],[1,0],[0,1],[-1,0]] #n,e,s,w
 def find_paths(x,y,s,sdir):
 #    print(x,y,f)
     if str(x)+"."+str(y) in visited:
-        if f in visited[str(x)+"."+str(y)]:
+        if s.char in visited[str(x)+"."+str(y)]:
             print("visited",x,y,s.char)
             if s.tracked==s.total:
                 return 0,0
-        else: visited[str(x)+"."+str(y)].append(f)
+        else: visited[str(x)+"."+str(y)].append(s.char)
     else:
-        visited[str(x)+"."+str(y)]=f
+        visited[str(x)+"."+str(y)]=s.char
     #compute total sides for this square
     s.total = check_adj(x,y,s)
     sides=0
     squares=1
-    print("finding ",f," next to ",x,y)
+    print("finding ",s.char," next to ",x,y)
     d = direction(sdir)
     sdir=d.left(sdir)
     #think of a nicer way to maange directions here...
@@ -87,7 +87,7 @@ def find_paths(x,y,s,sdir):
             sdir=d.right(sdir)
             s.tracked+=1
             continue
-        if grid[ny][nx]==s.char:
+        if grid[ny][nx].char==s.char:
             print("found another ",s.char," at: ",nx,ny,sdir)
             if s.fences[d.left(sdir)]==0:
                 sides+=1
@@ -120,14 +120,14 @@ for line in f.readlines():
     for char in line.strip():
         grid[y].append(square(char))
     y+=1
-print(grid)
+#print(grid)
 xmax=len(grid[0])-1
 ymax=len(grid)-1
 
 index=0
 for y in range(len(grid)):
     for x in range(len(grid[y])):
-        print ("testing:", x,y,grid[y][x])
+        print ("testing:", x,y,grid[y][x].char)
         sides,squares=find_paths(x,y,grid[y][x],0)
         if sides>0 or squares>0:
             fields[grid[y][x].char+"."+str(index)]=field(sides,squares)

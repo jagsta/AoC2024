@@ -21,11 +21,11 @@ class square:
 class direction:
     def __init__(self,d):
         self.cur=d
-    def left(d):
+    def left(self,d):
         d-=1
         if d<0: d+=4
         return d
-    def right(d):
+    def right(self,d):
         d+=1
         if d>3: d-=4
         return d
@@ -72,16 +72,16 @@ def find_paths(x,y,s,sdir):
     squares=1
     print("finding ",f," next to ",x,y)
     d = direction(sdir)
-    sdir=d.left(d.cur)
+    sdir=d.left(sdir)
     #think of a nicer way to maange directions here...
     for _ in range(3):
-        nx=x+sdir[0]
+        nx=x+sdirs[sdir][0]
         if nx<0 or nx>xmax:
             s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
             continue
-        ny=y+sdir[1]
+        ny=y+sdirs[sdir][1]
         if ny<0 or ny>ymax:
             s.fences[sdir]=1
             sdir=d.right(sdir)
@@ -89,7 +89,7 @@ def find_paths(x,y,s,sdir):
             continue
         if grid[ny][nx]==s.char:
             print("found another ",s.char," at: ",nx,ny,sdir)
-            if s.fences[d.left(sdir)==0:
+            if s.fences[d.left(sdir)]==0:
                 sides+=1
             if grid[ny][nx].fences==1:
                 sides-=1
@@ -97,12 +97,12 @@ def find_paths(x,y,s,sdir):
             sides+=nadj
             squares+=nsquares
         else:
-            if s.fences[d.left(sdir)==0:
+            if s.fences[d.left(sdir)]==0:
                 sides+=1
             sdir=d.right(sdir)
             s.tracked+=1
             s.fences[d.left(sdir)]=1
-    return adj,squares
+    return sides,squares
 
 filename="input.txt"
 if len(sys.argv)>1:
@@ -128,9 +128,9 @@ index=0
 for y in range(len(grid)):
     for x in range(len(grid[y])):
         print ("testing:", x,y,grid[y][x])
-        sides,squares=find_paths(x,y,grid[y][x])
-        if adj>0 or squares>0:
-            fields[grid[y][x]+"."+str(index)]=field(sides,squares)
+        sides,squares=find_paths(x,y,grid[y][x],0)
+        if sides>0 or squares>0:
+            fields[grid[y][x].char+"."+str(index)]=field(sides,squares)
             index+=1
 total=0
 for f in fields:

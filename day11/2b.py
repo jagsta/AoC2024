@@ -59,13 +59,9 @@ hits=0
 cache={}
 count=0
 targetblinks=75
-for blinks in range(targetblinks):
-    for n in stones:
-        blinks+=1
+for n in stones:
 #        print("processing ",n, "at ",blinks,"blinks")
-        result=process_number(str(n),blinks)
-        if blinks==targetblinks:
-            count+=result
+    count+=process_number(str(n),targetblinks)
 #        print("finished ",n," with result",result,"total",count)
 #    nx.draw_networkx(g,arrows=True)
 #    plt.show()

@@ -16,9 +16,6 @@
 
 
 
-from timeit import default_timer as timer
-import math
-
 f = open("input.txt")
 
 def process_number(n,target):

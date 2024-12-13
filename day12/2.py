@@ -14,9 +14,9 @@ import sys
 class square:
     def __init__(self, c):
         self.char=c
-    total=0
-    tracked=0
-    fences=[0,0,0,0] #nesw
+        self.total=0
+        self.tracked=0
+        self.fences=[0,0,0,0] #nesw
 
 class direction:
     def __init__(self,d):
@@ -56,52 +56,58 @@ def check_adj(x,y,s):
 sdirs=[[0,-1],[1,0],[0,1],[-1,0]] #n,e,s,w
 
 
-def find_paths(x,y,s,sdir):
+def find_paths(x,y,s,sdir,sides):
 #    print(x,y,f)
+    squares=0
     if str(x)+"."+str(y) in visited:
         if s.char in visited[str(x)+"."+str(y)]:
             print("visited",x,y,s.char)
             if s.tracked==s.total:
                 return 0,0
-        else: visited[str(x)+"."+str(y)].append(s.char)
+        else:
+            visited[str(x)+"."+str(y)].append(s.char)
     else:
         visited[str(x)+"."+str(y)]=s.char
+        squares=1
     #compute total sides for this square
     s.total = check_adj(x,y,s)
-    sides=0
-    squares=1
+    print("total fences for ",x,y,":",s.total," we've processed",s.tracked,sum(s.fences))
     print("finding ",s.char," next to ",x,y)
     d = direction(sdir)
     sdir=d.left(sdir)
     #think of a nicer way to maange directions here...
-    for _ in range(3):
+    for _ in range(4):
         nx=x+sdirs[sdir][0]
         if nx<0 or nx>xmax:
+            if s.fences[sdir]==0:
+                sides+=1
             s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
             continue
         ny=y+sdirs[sdir][1]
         if ny<0 or ny>ymax:
+            if s.fences[sdir]==0:
+                sides+=1
             s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
             continue
         if grid[ny][nx].char==s.char:
-            print("found another ",s.char," at: ",nx,ny,sdir)
             if s.fences[d.left(sdir)]==0:
                 sides+=1
-            if grid[ny][nx].fences==1:
-                sides-=1
-            nadj,nsquares=find_paths(nx,ny,grid[ny][nx],sdir)
+#            if grid[ny][nx].fences[d.left(sdir)]==1:
+#                sides-=1
+            print("found another ",s.char," at: ",nx,ny,sdirs[sdir]," sides:",sides,"fences",s.fences)
+            nadj,nsquares=find_paths(nx,ny,grid[ny][nx],sdir,sides)
             sides+=nadj
             squares+=nsquares
         else:
-            if s.fences[d.left(sdir)]==0:
+            if s.fences[sdir]==0:
                 sides+=1
+                s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
-            s.fences[d.left(sdir)]=1
     return sides,squares
 
 filename="input.txt"
@@ -128,13 +134,13 @@ index=0
 for y in range(len(grid)):
     for x in range(len(grid[y])):
         print ("testing:", x,y,grid[y][x].char)
-        sides,squares=find_paths(x,y,grid[y][x],0)
+        sides,squares=find_paths(x,y,grid[y][x],0,0)
         if sides>0 or squares>0:
             fields[grid[y][x].char+"."+str(index)]=field(sides,squares)
             index+=1
 total=0
 for f in fields:
     total+=fields[f].sides*fields[f].area
-    print(f,fields[f].sides,fields[f].area,fields[f].sides*fields[f].area)
+    print(f,fields[f].area,fields[f].sides,fields[f].sides*fields[f].area)
 
 print ("Cost:",total)

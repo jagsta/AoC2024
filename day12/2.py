@@ -9,6 +9,10 @@
 # check for matching square - yes, and direction is not passed direction, add 1 to sides coount, , add 1 to tracked fences and update square with fence  direction-1 and call func, no, rotate 90 right, repeat
 # return sides
 
+# What a tangled web I weave, I just can't get the above working
+# New approach: find fences for each square, record their position and area they enclose
+# Once finished analysing the grid, do a sequential pass both horizontally and vertically, tracking contiguous runs of fence (same Area and direction), incrementing sides per run
+
 import sys
 
 class square:
@@ -27,6 +31,10 @@ class direction:
         return d
     def right(self,d):
         d+=1
+        if d>3: d-=4
+        return d
+    def opp(self,d):
+        d+=2
         if d>3: d-=4
         return d
 
@@ -71,43 +79,62 @@ def find_paths(x,y,s,sdir,sides):
         squares=1
     #compute total sides for this square
     s.total = check_adj(x,y,s)
-    print("total fences for ",x,y,":",s.total," we've processed",s.tracked,sum(s.fences))
     print("finding ",s.char," next to ",x,y)
     d = direction(sdir)
     sdir=d.left(sdir)
     #think of a nicer way to maange directions here...
     for _ in range(4):
         nx=x+sdirs[sdir][0]
-        if nx<0 or nx>xmax:
-            if s.fences[sdir]==0:
+        if nx<0:
+            if grid[x][y+(sdirs[d.left(sdir)][1])].fences[sdir]!=1:
+                sides+=1
+            s.fences[sdir]=1
+            sdir=d.right(sdir)
+            s.tracked+=1
+            continue
+        if nx>xmax:
+            if grid[x][y+(sdirs[d.left(sdir)][1])].fences[sdir]!=1:
                 sides+=1
             s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
             continue
         ny=y+sdirs[sdir][1]
-        if ny<0 or ny>ymax:
-            if s.fences[sdir]==0:
+        if ny<0:
+            if grid[x+(sdirs[d.left(sdir)][0])][y].fences[sdir]!=1:
+                sides+=1
+            s.fences[sdir]=1
+            sdir=d.right(sdir)
+            s.tracked+=1
+            continue
+        if ny>ymax:
+            if grid[x+(sdirs[d.left(sdir)][0])][y].fences[sdir]!=1:
                 sides+=1
             s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
             continue
         if grid[ny][nx].char==s.char:
-            if s.fences[d.left(sdir)]==0:
-                sides+=1
+            if x>0 and x<xmax or y>0 and y<ymax:
+                print("checking ",sdirs[d.opp(sdir)][0],sdirs[d.opp(sdir)][1],d.left(sdir))
+                if grid[x+sdirs[d.opp(sdir)][0]][y+sdirs[d.opp(sdir)][1]].fences[d.left(sdir)]==0:
+                    sides+=1
 #            if grid[ny][nx].fences[d.left(sdir)]==1:
 #                sides-=1
             print("found another ",s.char," at: ",nx,ny,sdirs[sdir]," sides:",sides,"fences",s.fences)
-            nadj,nsquares=find_paths(nx,ny,grid[ny][nx],sdir,sides)
-            sides+=nadj
+            sides,nsquares=find_paths(nx,ny,grid[ny][nx],sdir,sides)
+#            sides+=nadj
             squares+=nsquares
         else:
-            if s.fences[sdir]==0:
-                sides+=1
-                s.fences[sdir]=1
+            if x>0 and x<xmax or y>0 and y<ymax:
+                if grid[x+(sdirs[d.opp(sdir)][0])][y+(sdirs[d.opp(sdir)][1])].fences[sdir]!=1:
+                    sides+=1
+                elif grid[x-(sdirs[d.opp(sdir)][0])][y-(sdirs[d.opp(sdir)][1])].fences[sdir]==1:
+                    sides-=1
+            s.fences[sdir]=1
             sdir=d.right(sdir)
             s.tracked+=1
+    print("total fences for ",x,y,":",s.total," we've processed",s.tracked,sum(s.fences))
     return sides,squares
 
 filename="input.txt"

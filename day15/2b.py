@@ -11,6 +11,7 @@ class robot:
         ny=y+self.dy
         n=grid[ny][nx]
 #        print(n,nx,ny)
+#       TODO: Need to index depth of search, add a new index of lists for each time we recurse, append to that index. This should preserve order?
         if n=="[" or n=="]":
             if d=="^" or d=="v":
                 if n=="[":

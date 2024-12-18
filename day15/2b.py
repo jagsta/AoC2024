@@ -6,44 +6,49 @@ class robot:
         self.x=x
         self.y=y
 
-    def look(self,x,y,d):
+    def look(self,x,y,d,depth):
         nx=x+self.dx
         ny=y+self.dy
         n=grid[ny][nx]
-#        print(n,nx,ny)
+        self.m.append([])
+        print(n,nx,ny)
 #       TODO: Need to index depth of search, add a new index of lists for each time we recurse, append to that index. This should preserve order?
         if n=="[" or n=="]":
             if d=="^" or d=="v":
                 if n=="[":
-                    self.m.append([nx,ny])
-                    self.m.append([nx+1,ny])
-                    p=self.look(nx,ny,d)
-                    q=self.look(nx+1,ny,d)
+                    if [nx,ny] not in self.m[depth]:
+                        self.m[depth].append([nx,ny])
+                    if [nx+1,ny] not in self.m[depth]:
+                        self.m[depth].append([nx+1,ny])
+                    p=self.look(nx,ny,d,depth+1)
+                    q=self.look(nx+1,ny,d,depth+1)
                 elif n=="]":
-                    self.m.append([nx-1,ny])
-                    self.m.append([nx,ny])
-                    p=self.look(nx,ny,d)
-                    q=self.look(nx-1,ny,d)
+                    if [nx-1,ny] not in self.m[depth]:
+                        self.m[depth].append([nx-1,ny])
+                    if [nx,ny] not in self.m[depth]:
+                        self.m[depth].append([nx,ny])
+                    p=self.look(nx,ny,d,depth+1)
+                    q=self.look(nx-1,ny,d,depth+1)
                 if p and q:
                     return 1
                 else:
                     return 0
-                # we need to cater for spread here
             else:
-                self.m.append([nx,ny])
-                r=self.look(nx,ny,d)
+                self.m[depth].append([nx,ny])
+                r=self.look(nx,ny,d,depth+1)
             return r
         if n=="#":
             return 0
         if n==".":
-            self.m.append([nx,ny])
+            self.m[depth].append([nx,ny])
             return 1
 
     def move(self,d):
         self.dx=sdirs[d][0]
         self.dy=sdirs[d][1]
         self.m=[]
-        canmove=self.look(self.x,self.y,d)
+        depth=0
+        canmove=self.look(self.x,self.y,d,depth)
         if canmove==1:
             return self.m
         elif canmove==0:
@@ -94,25 +99,34 @@ print(r.x,r.y,xmax,ymax)
 
 for m in moves:
     updates=r.move(m)
-    print(m,updates)
+    for u in updates:
+        print(u)
+    print(m,updates[0])
     if updates[0]!=[-1,-1]:
-        for update in reversed(updates):
-            if [update[0]-sdirs[m][0],update[1]-sdirs[m][1]] in updates:
+        for i in reversed(range(len(updates))):
+            for update in updates[i]:
+                if i>0:
+                    print("layer",i,update,"checking",update[0]-sdirs[m][0],update[1]-sdirs[m][1],"in",updates[i-1])
+                    if [update[0]-sdirs[m][0],update[1]-sdirs[m][1]] in updates[i-1]:
+                        print("matched in layer below")
 #                print(update,update[0]-sdirs[m][0],update[1]-sdirs[m][1])
-                grid[update[1]][update[0]]=grid[update[1]-sdirs[m][1]][update[0]-sdirs[m][0]]
-            else:
-                grid[update[1]][update[0]]="."
+                        square=grid[update[1]-sdirs[m][1]][update[0]-sdirs[m][0]]
+                        grid[update[1]][update[0]]=square
+                    else:
+                        grid[update[1]][update[0]]="."
+                else:
+                    grid[update[1]][update[0]]="."
         grid[r.y][r.x]="."
         r.x=r.x+sdirs[m][0]
         r.y=r.y+sdirs[m][1]
         grid[r.y][r.x]="@"
-        for update in updates:
-            if grid[update[1]][update[0]]=="[" and grid[update[1]][update[0]+1]!="]":
-                grid[update[1]][update[0]]="."
-            if grid[update[1]][update[0]]=="]" and grid[update[1]][update[0]-1]!="[":
-                grid[update[1]][update[0]]="."
-
-
+#        for update in updates:
+#            if grid[update[1]][update[0]]=="[" and grid[update[1]][update[0]+1]!="]":
+#                grid[update[1]][update[0]]="."
+#            if grid[update[1]][update[0]]=="]" and grid[update[1]][update[0]-1]!="[":
+#                grid[update[1]][update[0]]="."
+    else:
+        print("can't move,skipping")
     for line in grid:
         string=""
         for c in line:

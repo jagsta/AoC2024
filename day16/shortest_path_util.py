@@ -23,7 +23,7 @@ def calculate_bearing(G, u, v):
     return compass_bearing
 
 
-def penalty_turns(G, left_turn_penalty=60, right_turn_penalty=30):
+def penalty_turns(G, left_turn_penalty=1001, right_turn_penalty=1001):
     """
     Calculate left turn penalty for each node pair
     :param G:
@@ -35,10 +35,12 @@ def penalty_turns(G, left_turn_penalty=60, right_turn_penalty=30):
 
     for node in G.nodes():
         # Get incoming and outgoing edges
-        in_edges = list(G.in_edges(node, data=True))
-        out_edges = list(G.out_edges(node, data=True))
+        in_edges = list(G.edges(node, data=True))
+        print(in_edges)
+        out_edges = list(G.edges(node, data=True))
+        print(out_edges)
 
-        for u, _, data_in in in_edges:
+        for _, u, data_in in in_edges:
             for _, v, data_out in out_edges:
                 if is_left_turn(data_in['bearing'], data_out['bearing']):
                     penalty[u, node, v] = left_turn_penalty

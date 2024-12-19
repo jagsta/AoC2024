@@ -98,13 +98,16 @@ def shortest_path_turn_penalty(G, source, target, weight="travel_time", penalty=
                     u_dist = dist[u][m]
                     if vu_dist < u_dist:
                         raise ValueError("Contradictory paths found:", "negative weights?")
-            elif u not in seen or m not in seen[u] or vu_dist < seen[u][m]:
+            elif u not in seen or m not in seen[u] or vu_dist <= seen[u][m]:
                 if u not in seen:
                     seen[u] = {}
                 seen[u][m] = vu_dist
                 push(fringe, (vu_dist, next(c), u, m))
                 if paths is not None:
-                    paths[u] = paths[v] + [u]
+                    if u in paths:
+                        paths[u].append(paths[v] + [u])
+                    else:
+                        paths[u] = paths[v] + [u]
 
     # The optional predecessor and path dictionaries can be accessed
     # by the caller via the pred and paths objects passed as arguments.

@@ -8,14 +8,13 @@ def fit2(string):
     if string=="":
         return 1
     sub=""
-    while len(sub)<=lmax and len(string)>len(sub) and not found:
+    while len(sub)<=lmax and len(string)>len(sub):
         sub+=string[len(sub)]
 #        print("looking for",sub,"in",lstring)
-        for t in towels:
-            if sub in towels and not found:
-#                print("found",sub,"in",string,"remains",string[len(sub):])
-                #found a match for this substring, check for remainder of string
-                found+=fit2(string[len(sub):])
+        if sub in towels:
+#            print("found",sub,"in",string,"remains",string[len(sub):])
+            #found a match for this substring, check for remainder of string
+            found+=fit2(string[len(sub):])
     return found
 
 

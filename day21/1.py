@@ -1,3 +1,4 @@
+# Reimplement as graphs for keypad and dirpad, calculate all shortest paths between each node and use those to build a set of paths, then take the shortest from final set as result
 import sys
 
 file="input.txt"

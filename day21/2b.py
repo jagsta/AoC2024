@@ -10,7 +10,7 @@ if len(sys.argv)>1:
 f=open(file)
 
 # I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
-def getkeypaths(a,b,path):
+def getkeypaths(a,b):
     temp=set()
     for p in keypaths[a][b]:
         s=""
@@ -18,10 +18,10 @@ def getkeypaths(a,b,path):
             u=p[i]
             v=p[i+1]
             s+=keys[u][v]['d']
-        temp.add(path+s+"A")
+        temp.add(s+"A")
     return temp
 
-def getdirpaths(a,b,path):
+def getdirpaths(a,b):
     temp=set()
     for p in dirpaths[a][b]:
         s=""
@@ -29,7 +29,7 @@ def getdirpaths(a,b,path):
             u=p[i]
             v=p[i+1]
             s+=dirs[u][v]['d']
-        temp.add(path+s+"A")
+        temp.add(s+"A")
     return temp
 
 
@@ -82,11 +82,13 @@ for code in codes:
         if len(paths)>0:
             temp=set()
             for p in paths:
-                r=getkeypaths(str(code[i]),str(code[i+1]),p)
-                temp.update(r)
+                r=getkeypaths(str(code[i]),str(code[i+1]))
+                for rp in r:
+                    print(r,rp,p)
+                    temp.add(p+rp)
             paths=temp
         else:
-            r=getkeypaths(str(code[i]),str(code[i+1]),"")
+            r=getkeypaths(str(code[i]),str(code[i+1]))
             paths.update(r)
     print(code)
     for p in paths:
@@ -100,6 +102,9 @@ for code in codes:
         #for each path in our list
         tt=set()
         for path in paths:
+            if path in pathcache:
+                tt.update(pathcache[path])
+                continue
             t=set()
             # start at A
             path="A"+path
@@ -112,23 +117,26 @@ for code in codes:
                     temp=set()
                     for p in t:
                         # Add to existing paths any permutations of routes from a to b
-                        if str(path[i])+"."+str(path[i+1]+"."+p) in pathcache:
+                        if str(path[i])+"."+str(path[i+1]) in pathcache:
                             #print("cache hit",str(path[i])+"."+str(path[i+1])+"."+p,pathcache[str(path[i])+"."+str(path[i+1])+"."+p])
-                            temp.update(pathcache[str(path[i])+"."+str(path[i+1])+"."+p])
+                            for rp in pathcache[str(path[i])+"."+str(path[i+1])]:
+                                temp.add(p+rp)
                             continue
-                        r=getdirpaths(str(path[i]),str(path[i+1]),p)
-                        pathcache[str(path[i])+"."+str(path[i+1])+"."+p]=r
-                        temp.update(r)
+                        r=getdirpaths(str(path[i]),str(path[i+1]))
+                        pathcache[str(path[i])+"."+str(path[i+1])]=r
+                        for rp in r:
+                            temp.add(p+rp)
                     t=temp
                 else:
                     if str(path[i])+"."+str(path[i+1]) in pathcache:
                         #print("cache hit",str(path[i])+"."+str(path[i+1]),pathcache[str(path[i])+"."+str(path[i+1])])
                         t.update(pathcache[str(path[i])+"."+str(path[i+1])])
                         continue
-                    r=getdirpaths(str(path[i]),str(path[i+1]),"")
+                    r=getdirpaths(str(path[i]),str(path[i+1]))
                     pathcache[str(path[i])+"."+str(path[i+1])]=r
                     t.update(r)
             tt.update(t)
+            pathcache[path[1:]]=t
         paths=tt
         if iterations==imax-1:
             print(len(min(paths, key=len)), min(paths, key=len))

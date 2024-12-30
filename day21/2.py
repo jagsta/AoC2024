@@ -1,7 +1,6 @@
 # Reimplement as graphs for keypad and dirpad, calculate all shortest paths between each node and use those to build a set of paths, then take the shortest from final set as result
 import sys
 import networkx as nx
-import functools
 
 file="input.txt"
 
@@ -11,7 +10,6 @@ if len(sys.argv)>1:
 f=open(file)
 
 # I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
-@functools.cache
 def getkeypaths(a,b,path):
     temp=set()
     for p in keypaths[a][b]:
@@ -23,9 +21,7 @@ def getkeypaths(a,b,path):
         temp.add(path+s+"A")
     return temp
 
-@functools.cache
 def getdirpaths(a,b,path):
-#    print(a,"to",b,"current path is",path)
     temp=set()
     for p in dirpaths[a][b]:
         s=""
@@ -63,6 +59,8 @@ for k,v in dirpaths.items():
 
 #print(keypaths["A"][7])
 
+pathcache={}
+
 codes=[]
 for line in f.readlines():
     codes.append(line.strip())
@@ -94,37 +92,43 @@ for code in codes:
     for p in paths:
         print(p)
     #Repeat this for however many layers of panels required
-    imax=2
+    imax=25
     for iterations in range(imax):
         print("Iteration",iterations)
         #
         #copy paths to a a new set to avoid in loop changes to set we iterate
-        t=set()
-        t=paths
         #for each path in our list
-        for path in t:
-            paths=set()
+        tt=set()
+        for path in paths:
+            t=set()
             # start at A
             path="A"+path
             print(path)
             # iterate through the characters in the path
             for i in range(len(path)-1):
                 # if this is the first time, paths will be empty
-                if len(paths)>0:
+                if len(t)>0:
                     #We've started bulding new sequences
                     temp=set()
-                    for p in paths:
+                    for p in t:
+                        if p in pathcache:
+                            print("cache hit",p)
+                            t=pathcache[p]
+                            continue
                         # Add to existing paths any permutations of routes from a to b
                         r=getdirpaths(str(path[i]),str(path[i+1]),p)
                         temp.update(r)
-                    paths=temp
-                    if iterations==imax-1 and i==len(path)-2:
-                        print(len(min(paths, key=len)), min(paths, key=len))
-                        if len(min(paths, key=len))<lengths[code]:
-                            lengths[code]=len(min(paths, key=len))
+                    t=temp
+                    pathcache[p]=t
                 else:
                     r=getdirpaths(str(path[i]),str(path[i+1]),"")
-                    paths.update(r)
+                    t.update(r)
+            tt.update(t)
+        paths=tt
+        if iterations==imax-1:
+            print(len(min(paths, key=len)), min(paths, key=len))
+            if len(min(paths, key=len))<lengths[code]:
+                lengths[code]=len(min(paths, key=len))
 
 for k,v in lengths.items():
     total=total+(int(k[1:-1])*v)

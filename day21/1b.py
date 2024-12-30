@@ -1,6 +1,7 @@
 # Reimplement as graphs for keypad and dirpad, calculate all shortest paths between each node and use those to build a set of paths, then take the shortest from final set as result
 import sys
 import networkx as nx
+import functools
 
 file="input.txt"
 
@@ -9,15 +10,48 @@ if len(sys.argv)>1:
 
 f=open(file)
 
+# I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
 def getkeypaths(a,b,paths):
+    temp=set()
     if len(paths)>0:
         for path in paths:
             for p in keypaths[a][b]:
-                paths.add(path.append(p))
+                s=""
+                for i in range(len(p)-1):
+                    u=p[i]
+                    v=p[i+1]
+                    s+=keys[u][v]['d']
+                temp.add(path+s+"A")
     else:
         for p in keypaths[a][b]:
-            paths.add(p)
-    return paths
+            s=""
+            for i in range(len(p)-1):
+                u=p[i]
+                v=p[i+1]
+                s+=keys[u][v]['d']
+            temp.add(s+"A")
+    return temp
+
+def getdirpaths(a,b,paths):
+    temp=set()
+    if len(paths)>0:
+        for path in paths:
+            for p in dirpaths[a][b]:
+                s=""
+                for i in range(len(p)-1):
+                    u=p[i]
+                    v=p[i+1]
+                    s+=dirs[u][v]['d']
+                temp.add(path+s+"A")
+    else:
+        for p in dirpaths[a][b]:
+            s=""
+            for i in range(len(p)-1):
+                u=p[i]
+                v=p[i+1]
+                s+=dirs[u][v]['d']
+            temp.add(s+"A")
+    return temp
 
 
 #Build graphs of keypads, directional so we can capture the directional moves between keys, then compute all shortest paths for all pairs of keys and store in a dict of dicts
@@ -50,16 +84,43 @@ codes=[]
 for line in f.readlines():
     codes.append(line.strip())
 
+lengths={}
 total=0
 for code in codes:
+    code="A"+code
+    lengths[code]=10000
     paths=set()
-    #for each key pair, return all paths, then recurse for each each of those until end of code
     for i in range(len(code)-1):
-        print(code[i],code[i+1])
-        paths=getkeypaths(code[i],code[i+1],paths)
+#        print(code[i],code[i+1])
+        paths=getkeypaths(str(code[i]),str(code[i+1]),paths)
     print(code)
-    for p in paths:
-        print(p)
+#    for p in paths:
+#        print(p)
 
+#robot stage 1
+    for path in paths:
+        path="A"+path
+        dirs1=set()
+        for i in range(len(path)-1):
+#            print(path[i],path[i+1])
+            dirs1=getdirpaths(str(path[i]),str(path[i+1]),dirs1)
+#        print(path)
+#        for p in dirs1:
+#            print(p)
+
+#robot stage 2
+        for path2 in dirs1:
+            path2="A"+path2
+            dirs2=set()
+            for i in range(len(path2)-1):
+#                print(path[i],path[i+1])
+                dirs2=getdirpaths(str(path2[i]),str(path2[i+1]),dirs2)
+#            print(path)
+            print(len(min(dirs2, key=len)), min(dirs2, key=len))
+            if len(min(dirs2, key=len))<lengths[code]:
+                lengths[code]=len(min(dirs2, key=len))
+
+for k,v in lengths.items():
+    total=total+(int(k[1:-1])*v)
+print(lengths)
 print(total)
-

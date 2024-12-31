@@ -29,16 +29,23 @@ def getkeypaths2(path):
         temp=temp2
     return temp
 
-def getdirpaths(a,b,layer):
+def getdirpaths(a,b,layer,index):
     #have we calculcated from this layer and this pair of keys before?
-    if a+b+str(layer) in pathcache:
-        print("cache hit",a,b,layer,"returning with value",pathcache[a+b+str(layer)])
-        return pathcache[a+b+str(layer)]
+    print("dirpath computing",a,b,"at layer",layer,"index",index)
+    if a+b+str(layer)+str(index) in pathcache:
+        print("cache hit",a,b,layer,index,"returning with value",pathcache[a+b+str(layer)+str(index)])
+        return pathcache[a+b+str(layer)+str(index)]
     #No, carry on with calculation
     length=0
     temp=set()
+    #for every permutation of paths between a and b
     for p in dirpaths[a][b]:
-        s=""
+        if index==0:
+            print(p,"at left extreme, prepending with A for next layer")
+            s="A"
+        else:
+            s=""
+        # replace each pair of keys with the direction needed to be pressed to make that move
         for j in range(len(p)-1):
             u=p[j]
             v=p[j+1]
@@ -46,7 +53,7 @@ def getdirpaths(a,b,layer):
         #Check this logic, we need to think about when we need to press A, and how to start at A at each new layer. I used to prepend the next layer but with DFS this won't work, I need to keep track of the lefthand side of the tree I think, and prefix with A if it's the far left character at each layer?
         s+="A"
         temp.add(s)
-    print("dirpath paths for",a,b,temp)
+    print("built",len(temp),"dirpath paths for",a,b,"paths are",temp)
     if layer==lmax:
         shortest=1000000000
         for seq in temp:
@@ -57,10 +64,10 @@ def getdirpaths(a,b,layer):
     else:
         for seq in temp:
             for i in range(len(seq)-1):
-                length+=getdirpaths(seq[i],seq[i+1],layer+1)
+                length+=getdirpaths(seq[i],seq[i+1],layer+1,index+i)
 
-    print("adding to cache",a,b,layer)
-    pathcache[a+b+str(layer)]=length
+    print("adding to cache",a,b,layer,index)
+    pathcache[a+b+str(layer)+str(index)]=length
     return length
 
 
@@ -93,7 +100,7 @@ for k,v in dirpaths.items():
 
 pathcache={}
 
-lmax=2
+lmax=25
 codes=[]
 for line in f.readlines():
     codes.append(line.strip())
@@ -120,7 +127,7 @@ for code in codes:
         path="A"+path
         print(path)
         for i in range(len(path)-1):
-           length+=getdirpaths(path[i],path[i+1],1)
+           length+=getdirpaths(path[i],path[i+1],1,i)
         if length<lengths[code]:
             lengths[code]=length
 for k,v in lengths.items():

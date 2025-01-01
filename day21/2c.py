@@ -9,7 +9,7 @@ if len(sys.argv)>1:
     file=sys.argv[1]
 
 f=open(file)
-lmax=2
+lmax=25
 
 # I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
 def getkeypaths2(path):
@@ -30,12 +30,12 @@ def getkeypaths2(path):
         temp=temp2
     return temp
 
-def getdirpaths(a,b,layer,index):
+def getdirpaths(a,b,layer):
     #have we calculcated from this layer and this pair of keys before?
-    print("dirpath computing",a,b,"at layer",layer,"index",index)
-    if a+b+str(layer)+str(index) in pathcache:
-        print("cache hit",a,b,layer,index,"returning with value",pathcache[a+b+str(layer)+str(index)])
-        return pathcache[a+b+str(layer)+str(index)]
+    print("dirpath computing",a,b,"at layer",layer)
+    if a+b+str(layer) in pathcache:
+        print("cache hit",a,b,layer,"returning with value",pathcache[a+b+str(layer)])
+        return pathcache[a+b+str(layer)]
     #No, carry on with calculation
     length={}
     temp=set()
@@ -66,11 +66,11 @@ def getdirpaths(a,b,layer,index):
             else:
                 length[seq]=0
             for i in range(len(seq)-1):
-                length[seq]+=getdirpaths(seq[i],seq[i+1],layer+1,index+i)
+                length[seq]+=getdirpaths(seq[i],seq[i+1],layer+1)
     minlength=min(length.values())
     print("values for paths from here were ",length.values())
-    print("adding to cache",a,b,"layer",layer,"position",index,"value",minlength)
-    pathcache[a+b+str(layer)+str(index)]=minlength
+    print("adding to cache",a,b,"layer",layer,"value",minlength)
+    pathcache[a+b+str(layer)]=minlength
     return minlength
 
 
@@ -126,7 +126,7 @@ for code in codes:
         length=0
         path="A"+path
         for i in range(len(path)-1):
-            length+=getdirpaths(path[i],path[i+1],1,i)
+            length+=getdirpaths(path[i],path[i+1],1)
         print("length for path",path,"is",length)
         if length<lengths[code]:
             lengths[code]=length

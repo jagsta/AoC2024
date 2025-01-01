@@ -1,3 +1,7 @@
+# Next attempt, for each layer, build a graph to represent possible sequences to represent the previous layer sequences
+# Then find all shortest paths for that layer, prune to that and use to build next layer graph?
+# Maybe some caching of function results will be required too.
+
 # Reimplement as graphs for keypad and dirpad, calculate all shortest paths between each node and use those to build a set of paths, then take the shortest from final set as result
 import sys
 import networkx as nx

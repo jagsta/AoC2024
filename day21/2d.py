@@ -16,6 +16,25 @@ f=open(file)
 lmax=3
 
 # I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
+
+def buildlayer(g):
+    ng=nx.DiGraph()
+    ng.add_node("start")
+    nn=0
+    #for all shortest paths between left and right hand end of sequence:
+    for path in nx.all_shortest_paths(g,"start","end")
+        #for each node in this path:
+        for node in path:
+            # We are always computing travel from an A button press
+            last="A"
+            #Get the sequence represented by this node
+            nodeseq=g[node]['seq']
+            for c in nodeseq:
+                paths=getdirpaths(last,c)
+                if len(paths)>1:
+                    for p in paths:
+
+
 def getkeypaths2(path):
     temp=set()
     for i in range(len(path)-1):

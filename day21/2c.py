@@ -9,7 +9,7 @@ if len(sys.argv)>1:
     file=sys.argv[1]
 
 f=open(file)
-lmax=3
+lmax=2
 
 # I think I need to resolve the directions at this point, and suffix the A button at the end, I think this is easier than trying to retrofit
 def getkeypaths2(path):
@@ -41,11 +41,7 @@ def getdirpaths(a,b,layer,index):
     temp=set()
     #for every permutation of paths between a and b
     for p in dirpaths[a][b]:
-        if index==0:
-            print(p,"at left extreme, prepending with A for next layer")
-            s="A"
-        else:
-            s=""
+        s=""
         # replace each pair of keys with the direction needed to be pressed to make that move
         for j in range(len(p)-1):
             u=p[j]
@@ -53,16 +49,14 @@ def getdirpaths(a,b,layer,index):
             s+=dirs[u][v]['d']
         #Check this logic, we need to think about when we need to press A, and how to start at A at each new layer. I used to prepend the next layer but with DFS this won't work, I need to keep track of the lefthand side of the tree I think, and prefix with A if it's the far left character at each layer?
         s+="A"
+        s="A"+s
         temp.add(s)
     print("built",len(temp),"dirpath paths for",a,b,"at layer",layer,"paths are",temp)
     if layer==lmax:
         shortest=1000000000
         for seq in temp:
             if len(seq)<shortest:
-                if index==0:
-                    shortest=len(seq)-1
-                else:
-                    shortest=len(seq)
+                shortest=len(seq)-1
         print("bottomed out at layer",lmax,"calculating shortest sequence is",shortest)
         return shortest
     else:

@@ -45,11 +45,11 @@ class full_adder:
             x="x"+str(bit)
             y="y"+str(bit)
             z="z"+str(bit)
-        if x not in self.gxor1.inputs or y not in self.gxor1.inputs::
+        if x not in self.gxor1.inputs or y not in self.gxor1.inputs:
             valid = False
         if self.gxor1.out not in self.gxor2.inputs:
             valid = False
-        if self.gxor2.out != z
+        if self.gxor2.out != z:
             valid = False
         if x not in self.gand1.inputs or y not in self.gand1.inputs:
             valid = False
@@ -70,6 +70,7 @@ if len(sys.argv)>1:
 f = open(file)
 
 G=nx.DiGraph()
+adders=[None]*45
 
 values={}
 commands=[]

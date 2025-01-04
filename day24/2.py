@@ -244,4 +244,7 @@ for i in range(45):
             print(adders[i])
             print("bit",i-1,"cout",adders[i-1].cout)
 
-print(sorted(wires))
+s=""
+for i in sorted(wires):
+    s+=i+","
+print(s[:-1])

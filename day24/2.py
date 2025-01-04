@@ -44,7 +44,7 @@ class full_adder:
 
     def check(self,bit,adders):
         valid=True
-        outs=[]
+        outs=set()
         if bit < 10:
             x="x0"+str(bit)
             y="y0"+str(bit)
@@ -56,57 +56,46 @@ class full_adder:
         #1. Are the two bit inputs correct?
         if x not in self.gxor1.inputs:
             valid=False
-            outs.append(x)
-            outs.append(gxor1.inputs)
+            outs.add(x)
         if y not in self.gxor1.inputs:
             valid=False
-            outs.append(y)
-            outs.append(gxor1.inputs)
+            outs.add(y)
         #2. Is the carry bit input correct?
         if self.gxor2 and (adders[bit-1].cout not in self.gxor2.inputs or adders[bit-1].cout not in self.gand2.inputs):
             valid = False
-            outs.append(adders[bit-1].cout)
-            outs.append(self.gand2.inputs)
-            outs.append(self.gxor2.inputs)
+            outs.add(adders[bit-1].cout)
         #3. Is xor2 bit inputs correect?
         if self.gxor1 and self.gxor2 and self.gxor1.out not in self.gxor2.inputs:
             valid = False
-            outs.append(self.gxor1.out)
-            outs.append(self.gxor2.inputs)
+            outs.add(self.gxor1.out)
         if self.gxor2 and adders[bit-1].cout  not in self.gxor2.inputs:
             valid = False
-            outs.append(adders[bit-1].cout)
-            outs.append(self.gxor2.inputs)
+            outs.add(adders[bit-1].cout)
         #5. Is SUM output correct?
         if self.gxor2 and self.gxor2.out != z:
             valid = False
-            outs.append(self.gxor2.out)
-            outs.append(z)
+            outs.add(self.gxor2.out)
+            outs.add(z)
         #6. Is and1 bit inputs correct?
         if x not in self.gand1.inputs:
             valid = False
-            outs.append(x)
-            outs.append(self.gand1.inputs)
+            outs.add(x)
         if y not in self.gand1.inputs:
             valid = False
-            outs.append(y)
-            outs.append(self.gand1.inputs)
+            outs.add(y)
         #7. Is and2 bit inputs correct?
         if self.gxor1 and self.gand2 and self.gxor1.out not in self.gand2.inputs:
             valid = False
-            outs.append(self.gxor1.out)
-            outs.append(self.gand2.inputs)
+            outs.add(self.gxor1.out)
         if self.gor and self.gand1.out not in self.gor.inputs:
             valid = False
-            outs.append(self.gand1.out)
-            outs.append(self.gand2.inputs)
+            outs.add(self.gand1.out)
         if self.gor and self.gand2.out not in self.gor.inputs:
             valid = False
-            outs.append(self.gand2.out)
-            outs.append(self.gor.inputs)
+            outs.add(self.gand2.out)
         if not (self.gand1 and self.gand2 and self.gxor1 and self.gxor2 and self.gor):
             valid = False
-            outs.append("missing logic component")
+            outs.add("missing logic component")
         return valid,outs
 
 
@@ -176,6 +165,7 @@ for b in reversed(result):
     answer+=str(b)
 print(int(answer,2))
 
+wires=set()
 carry=""
 for i in range(45):
     if i<10:
@@ -249,9 +239,9 @@ for i in range(45):
         adders[i].outs()
         validate,error=adders[i].check(i,adders)
         if not validate:
+            wires.update(error)
             print("bit",i,"invalid",error)
             print(adders[i])
             print("bit",i-1,"cout",adders[i-1].cout)
 
-
-
+print(sorted(wires))

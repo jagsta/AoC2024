@@ -202,8 +202,6 @@ for i in range(45):
         carry=andout
         adders[i].outs()
     else:
-        and2in=adders[i-1].cout
-        xor2in=adders[i-1].cout
         res = [key for key in xors.keys() if re.search(xorout, key)]
         if len(res)==1:
             adders[i].gxor2=xors[res[0]]
@@ -211,13 +209,6 @@ for i in range(45):
             print("extra xor2 for adder",i)
         else:
             print("missed xor2 for adder",i)
-            res = [key for key in xors.keys() if re.search(xor2in, key)]
-            if len(res)==1:
-                adders[i].gxor2=xors[res[0]]
-            elif len(res)>1:
-                print("extra xor2 for adder",i)
-            else:
-                print("missed xor2 for adder",i)
         res = [key for key in ands.keys() if re.search(xorout, key)]
         if len(res)==1:
             adders[i].gand2=ands[res[0]]
@@ -225,13 +216,6 @@ for i in range(45):
             print("extra and2 for adder",i)
         else:
             print("missed and2 for adder",i)
-            res = [key for key in ands.keys() if re.search(and2in, key)]
-            if len(res)==1:
-                adders[i].gand2=ands[res[0]]
-            elif len(res)>1:
-                print("extra and2 for adder",i)
-            else:
-                print("missed and2 for adder",i)
         res = [key for key in ors.keys() if re.search(andout, key)]
         if len(res)==1:
             adders[i].gor=ors[res[0]]
@@ -239,13 +223,6 @@ for i in range(45):
             print("extra or for adder",i)
         else:
             print("missed or for adder",i)
-            res = [key for key in ors.keys() if re.search(adders[i].gand2.out, key)]
-            if len(res)==1:
-                adders[i].gor=ors[res[0]]
-            elif len(res)>1:
-                print("extra or for adder",i)
-            else:
-                print("missed or for adder",i)
         adders[i].outs()
         validate,error=adders[i].check(i,adders)
         if not validate:
